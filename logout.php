@@ -4,6 +4,11 @@
 	<title>Codedada - Logout</title>
 	<?php
 		include("includes/header.php");
+		if(!isset($_SESSION["username"])) {
+			header("location:login.php");
+		}
+		session_start();
+		session_destroy();
 	?>
 </head>
 <body>
