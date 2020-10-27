@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Codedada</title>
+	<title>Codedada - Problems</title>
 	<?php
 		session_start();
 		include("includes/db_connection.php");
@@ -24,5 +24,8 @@
 			</div>
 		</div>
 	</div>
+	<script type="text/javascript">
+		activate("nav1");
+	</script>
 </body>
 </html>

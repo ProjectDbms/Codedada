@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Codedada</title>
+	<title>Codedada - Contest</title>
 	<?php
 		session_start();
 		include("includes/db_connection.php");
@@ -15,14 +15,10 @@
 <body>
 	<?php include("includes/navbar.php"); ?>
 	<div class="container-fluid main">
-		<div class="row">
-			<div class="col col-xs-7 col-md-8" style="background-color: lightblue;">
-				fd
-			</div>
-			<div class="col col-xs-5 col-md-4" style="background-color: lightgreen;">
-				dff
-			</div>
-		</div>
+		
 	</div>
+	<script type="text/javascript">
+		activate("nav2");
+	</script>
 </body>
 </html>

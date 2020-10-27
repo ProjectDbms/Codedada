@@ -9,6 +9,8 @@
 		}
 		session_start();
 		session_destroy();
+		include("includes/db_connection.php");
+		mysqli_close($conn);
 	?>
 </head>
 <body>
