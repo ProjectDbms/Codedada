@@ -36,6 +36,7 @@
                         $row = mysqli_fetch_assoc($result);
                         if($row['organizer']) {
                             echo '<a class="dropdown-item" href="organizer/manage.php"><i class="fa fa-plus" aria-hidden="true"></i> Manage Contests</a>';
+                            echo '<a class="dropdown-item" href="organizer/create_contest.php"><i class="fa fa-plus" aria-hidden="true"></i> Create Contests</a>';
                             echo '<a class="dropdown-item" href="#"><i class="fa fa-trophy" aria-hidden="true"></i> My Contests</a>';
                         }
                         if($row['admin']) {
@@ -43,7 +44,7 @@
                         }
                     ?>
                     <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#"><i class="fa fa-sign-out" aria-hidden="true"></i> Logout</a>
+                    <a class="dropdown-item" href="logout.php"><i class="fa fa-sign-out" aria-hidden="true"></i> Logout</a>
                 </div>
             </li>
         </ul>

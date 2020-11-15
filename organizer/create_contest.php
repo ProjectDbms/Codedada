@@ -16,24 +16,20 @@
 			$difficulty = $_POST['difficulty'];
 			$username = $_SESSION['username'];
 			$sql = "SELECT account_id FROM accounts WHERE username='$username'";
-			// echo $sql;
 			$result = mysqli_query($conn, $sql);
 			$row = mysqli_fetch_assoc($result);
-			// print_r($row);
 			$account_id = $row['account_id'];
 			$sql = "INSERT INTO contest(account_id, contest_name, description, start_time, end_time, difficulty) VALUES($account_id, '$contest_name', '$description', '$start_time', '$end_time', '$difficulty')";
 			
 			if(mysqli_query($conn, $sql)) {
 				
 			} else {
-				echo "Cannot create";
+				echo "<script>window.alert('Cannot create');</script>";
 			}
-			
-			// mysqli_free_result($result);
-            // mysqli_close($conn);
 		}
 		include("../includes/header.php");
 	?>
+	<link rel="icon" href="../assets/images/programming.png" type="image/png">
 	<link rel="stylesheet" href="../assets/css/create.css?q=<?php echo time(); ?>" type="text/css">
 </head>
 <body>

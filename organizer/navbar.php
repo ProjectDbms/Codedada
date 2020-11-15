@@ -1,5 +1,5 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-success">
-	    <a class="navbar-brand" href="index.php"><img src="../assets/images/programming.png" alt="icon" height="30px" width="30px"> Codedada</a>
+	    <a class="navbar-brand" href="../index.php"><img src="../assets/images/programming.png" alt="icon" height="30px" width="30px"> Codedada</a>
 	    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 	        <span class="navbar-toggler-icon"></span>
 	    </button>
@@ -30,14 +30,15 @@
 	                        $row = mysqli_fetch_assoc($result);
 	                        if($row['organizer']) {
 	                            echo '<a class="dropdown-item" href="manage.php"><i class="fa fa-plus" aria-hidden="true"></i> Manage Contests</a>';
-	                            echo '<a class="dropdown-item" href="#"><i class="fa fa-trophy" aria-hidden="true"></i> My Contests</a>';
+	                            echo '<a class="dropdown-item" href="create_contest.php"><i class="fa fa-plus" aria-hidden="true"></i> Create Contests</a>';
+	                            echo '<a class="dropdown-item" href="create_contest.php"><i class="fa fa-trophy" aria-hidden="true"></i> My Contests</a>';
 	                        }
 	                        if($row['admin']) {
 	                            echo '<a class="dropdown-item" href="#"><i class="fa fa-lock" aria-hidden="true"></i> Admin</a>';
 	                        }
 	                    ?>
 	                    <div class="dropdown-divider"></div>
-	                    <a class="dropdown-item" href="#"><i class="fa fa-sign-out" aria-hidden="true"></i> Logout</a>
+	                    <a class="dropdown-item" href="../logout.php"><i class="fa fa-sign-out" aria-hidden="true"></i> Logout</a>
 	                </div>
 	            </li>
 	        </ul>
