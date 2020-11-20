@@ -35,3 +35,11 @@ CREATE TABLE IF NOT EXISTS testcase (
 	points INTEGER,
 	CONSTRAINT FK_TESTCASE_QUESTION FOREIGN KEY(question_id) REFERENCES question(question_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+CREATE TABLE participant(
+    participant_id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    account_id INTEGER,
+    contest_id INTEGER,
+    FOREIGN KEY(account_id) REFERENCES accounts(account_id),
+    FOREIGN KEY (contest_id) REFERENCES contest(contest_id)
+);

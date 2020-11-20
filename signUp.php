@@ -15,9 +15,6 @@
         if(isset($_SESSION["username"])) {
             header("location:index.php");
         }
-        // if(isset($_POST["signUp"])) {
-
-        // }
 	?>
 	<link rel="stylesheet" href="assets/css/signUp.css?q=<?php echo time(); ?>" type="text/css">
 </head>
