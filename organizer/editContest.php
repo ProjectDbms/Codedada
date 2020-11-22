@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Codedada - Manage Contest</title>
+	<title>Codedada - Edit Contest</title>
 	<?php
 		session_start();
 		include("../includes/db_connection.php");
@@ -13,6 +13,51 @@
 	<link rel="icon" href="../assets/images/programming.png" type="image/png">
 	<link rel="stylesheet" href="../assets/css/create.css?q=<?php echo time(); ?>" type="text/css">
 	<?php
+		if(isset($_GET['deleteQuestion'])) {
+			$del_id = $_GET['deleteQuestion'];
+			$contest_id = $_GET["contestId"];
+			$del_sql = "DELETE FROM question WHERE question_id=$del_id";
+			mysqli_query($conn, $del_sql);
+			header("location: editContest.php?contestId=$contest_id");
+		}
+		if(isset($_POST["addQuestion"])) {
+			$contest_id = $_POST['contest_id'];
+			$question_name = $_POST['question_title'];
+			$question_desc = $_POST['question_desc'];
+			$testcase_inputs = $_POST['testcase_input'];
+			$testcase_outputs= $_POST['testcase_output'];
+			$points = $_POST['points'];
+			$level = $_POST['difficulty'];
+			$in_sql = "INSERT INTO question(question_name, contest_id, question_description, level) VALUES('$question_name', $contest_id, '$question_desc', '$level')";
+			if(mysqli_query($conn, $in_sql)) {
+				$last_id = mysqli_insert_id($conn);
+				echo "<script>
+					//window.location.href = 'editContest.php?contestId=$contest_id';
+				</script>";
+				$i = 0;
+				foreach($testcase_inputs as $testcase_input) {
+					$t_sql = "INSERT INTO testcase(question_id, testcase_input, testcase_output, points) VALUES($last_id, '$testcase_inputs[$i]', '$testcase_outputs[$i]', $points[$i])";
+					if($testcase_inputs[$i] != '' || $testcase_outputs[$i] != '') {
+						if(!mysqli_query($conn, $t_sql)) {
+							echo "<script>
+								window.alert('Database error in entering testcases');
+								window.location.href = 'editContest.php?contestId=$contest_id';
+							</script>";
+						}
+					}
+				}
+				echo "<script>
+					window.alert('Successfully Inserted');
+					window.location.href = 'editContest.php?contestId=$contest_id';
+				</script>";
+
+			} else {
+				echo "<script>
+					window.alert('Error');
+					window.location.href = 'editContest.php?contestId=$contest_id';
+				</script>";
+			}
+		}
 		if(isset($_POST["updateQuestion"])) {
 			$contest_id = $_POST['contest_id'];
 			$question_id = $_POST['question_id'];
@@ -74,7 +119,7 @@
 				header("location: manage.php?contestId=$contest_id");
 			}
 		}
-		if(isset($_GET["contestId"]) || isset($_POST["updateContest"]) || isset($_POST["updateQuestion"])) {
+		if(isset($_GET["contestId"]) || isset($_POST["addQuestion"]) || isset($_POST["updateContest"]) || isset($_POST["updateQuestion"])) {
 			$contest_id = $_GET["contestId"];
 			$sql = "SELECT * FROM contest WHERE contest_id='$contest_id'";
 			$result = mysqli_query($conn, $sql);
@@ -141,6 +186,7 @@
 				<th>Question</th>
 				<th>Level</th>
 				<th>Points</th>
+				<th>Delete</th>
 			</thead>
 			<tbody>
 				<?php foreach($questions as $question) { ?>
@@ -209,13 +255,6 @@
 													<script type="text/javascript">
 														$('.add-tcase-btn').click(function(event) {
 															event.preventDefault();
-															// var e = $(this);
-															// var title = e.data('title');
-															// var body = e.data('value');
-															// $('.modal-title').html(title);
-															// $('.modal-body').html(body);
-															// $('#question<?php //echo $question_id ?>ModalLong').modal('show');
-
 															var t="<p class='text-danger font-weight-bold'>New Testcase</p>";
 															t += "<label>Testcase Input</label><br>";
 															t += "<textarea name='testcase_input[]' cols='50' rows='3' class='form-control'></textarea><br>";
@@ -244,20 +283,56 @@
 						<td><?php echo $question_desc ?></td>
 						<td><?php echo $level ?></td>
 						<td><?php echo $points ?></td>
-						<!-- <td> -->
-							<!-- Button trigger modal -->
-							<!-- Edit -->
-						<!-- </td> -->
+						<td><a href="editContest.php?contestId=<?php echo $contest_id ?>&deleteQuestion=<?php echo $question_id ?>" class="btn btn-danger">Delete</a></td>
 					</tr>
 				<?php } ?>
 			</tbody>
 		</table>
 	</div>
 	<div class="container-fluid mt-2">
-		<form action="">
-
-		</form>
+		<div class="container mt-5" style="border: 2px solid #dc3545; padding: 2rem; border-radius: 5px;">
+			<h3 class="mt-1">Add Questions</h3>
+			<div class="add-questions">
+				<form action="editContest.php" method="post">
+					<div class="form-group">
+						<input type="hidden" name="contest_id" value="<?php echo $_GET['contestId'] ?>">
+						<label>Question Title</label><br>
+						<input type="text" name="question_title" class="form-control" required><br>
+						<label>Question</label><br>
+						<textarea name="question_desc" cols="30" rows="3" class="form-control"></textarea><br>
+						<select name="difficulty" class="form-control">
+							<option value="Easy">Easy</option>
+							<option value="Medium">Medium</option>
+							<option value="Difficult">Difficult</option>
+						</select><br>
+						<div class="testcase-group mb-3" style="border: 2px solid #17a2b8; padding: 2rem; border-radius: 5px;">
+							<p class="alert alert-info">Leave the fields empty and points as 0 for to delete the testcase</p>
+							<a class="btn btn-info" id="add-question">Add Testcase</a><br><br>
+							<label>Testcase Input</label><br>
+							<textarea name="testcase_input[]" cols="30" rows="3" class="form-control"></textarea><br>
+							<label>Testcase Output</label><br>
+							<textarea name="testcase_output[]" cols="30" rows="3" class="form-control"></textarea><br>
+							<input type="text" class="form-control" name="points[]" placeholder="points" required><br><br>
+						</div>
+					</div>
+					<input type="submit" name="addQuestion" class="btn btn-primary" value="Submit">
+				</form>
+			</div>
+			<!-- <br> -->
+			<!-- <br> -->
+		</div>
+		<br><br><br>
 	</div>
+	<script type="text/javascript">
+		$("#add-question").click(function(event) {
+			t = "<label>Testcase Input</label><br>";
+			t += "<textarea name='testcase_input[]' cols='30' rows='3' class='form-control'></textarea><br>";
+			t += "<label>Testcase_output</label><br>";
+			t += "<textarea name='testcase_output[]' cols='30' rows='3' class='form-control'></textarea><br>";
+			t += "<input type='text' class='form-control' name='points[]' placeholder='points' required><br><br>";
+			$(this).parent().append(t);
+		});
+	</script>
 </body>
 </html>
 
