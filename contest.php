@@ -60,6 +60,20 @@
 	<link rel="stylesheet" href="assets/css/index.css?q=<?php echo time(); ?>" type="text/css">
 	<link rel="stylesheet" href="assets/css/timeTo.css?q=<?php echo time(); ?>" type="text/css">
 	<script type="text/javascript" src="assets/js/jquery-time-to.js"></script>
+	<script type="text/javascript">
+		function countdownCalc(startTime, contestId) {
+			$("#timer"+contestId).timeTo({
+				timeTo: new Date(new Date(startTime)),
+				theme: "black",
+				displayCaptions: true,
+				fontSize: 21,
+				captionSize: 10,
+				callback: function() {
+					window.location.href = "contest.php";
+				}
+			});
+		}
+	</script>
 	<script type="text/javascript" src="assets/js/contestFunctions.js"></script>
 </head>
 <body>

@@ -49,10 +49,18 @@
 							?>
 						</td>
 						<td>
-							Ranks
+							<a href="rank.php?contestId=<?php echo $contId ?>">Ranks</a>
 						</td>
 						<td>
-							Users
+							<!-- Users -->
+							<?php
+								$contest_id = $contest['contest_id'];
+								$count_sql = "SELECT COUNT(participant_id) FROM participant WHERE contest_id=$contest_id";
+								$count_restult = mysqli_query($conn, $count_sql);
+								$row = mysqli_fetch_row($count_restult);
+								// print_r($row);
+								echo $row[0];
+							?>
 						</td>
 					</tr>
 				<?php } ?>

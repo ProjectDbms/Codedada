@@ -1,15 +1,3 @@
-function countdownCalc(startTime, contestId) {
-	$("#timer"+contestId).timeTo({
-	    timeTo: new Date(new Date(startTime)),
-	    theme: "black",
-	    displayCaptions: true,
-	    fontSize: 21,
-	    captionSize: 10,
-	    callback: function() {
-	    	window.location.href = "contest.php";
-	    }
-	});
-}
 function timeExceed(t, s) {
 	if(t > 9)
 		return t + s

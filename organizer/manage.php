@@ -36,6 +36,7 @@
 						<th>Description</th>
 						<th>Start time</th>
 						<th>End time</th>
+						<th>Status</th>
 						<th colspan="2">Buttons</th>
 					</tr>
 				</thead>
@@ -50,8 +51,19 @@
 						?>
 					</td>
 					<td><?php 
-							$stt = strtotime($contest['end_time']);
-							echo date("d-m-Y h:i:s a", $stt)
+							$endt = strtotime($contest['end_time']);
+							echo date("d-m-Y h:i:s a", $endt)
+						?>
+					</td>
+					<td>
+						<?php
+							if (strtotime($contest['start_time']) < time() && strtotime($contest['end_time']) > time()) {
+								echo "<p class='text-danger'>Running</p>";
+							} elseif(strtotime($contest['start_time']) > time()) {
+								echo "<p class='text-success'>Yet to start</p>";
+							} else {
+								echo "<p>Ended</p>";
+							}
 						?>
 					</td>
 					<td><button class="btn btn-primary" onclick="editContest(<?php echo $contest['contest_id']; ?>)">Edit</button></td>
