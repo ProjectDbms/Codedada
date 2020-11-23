@@ -49,7 +49,7 @@
 						</td>
 						<td>
 							<?php if(check_reg($_SESSION['username'], $contest['contest_id'])) { $_SESSION["is_registered_$present_contest_id"]=true; ?>
-								<a href="join_contest.php?contestId=<?php echo $contest['contest_id'] ?>">Join</a>
+								<a href="join_contest.php?contestId=<?php echo $contest['contest_id'] ?>&problems=<?php echo $contest['contest_id'] ?>">Join</a>
 							<?php } else { ?>
 								<a href="contest.php?registerContest=<?php echo $contest['contest_id'] ?>" style="color: white;background-color: red !important;">Register</a>
 							<?php } ?>
