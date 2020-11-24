@@ -9,6 +9,7 @@
 			header("location: login.php");
 		}
         include("includes/header.php");
+        // if()
         if(isset($_GET['contestId'])) {
             $contest_id = $_GET['contestId'];
             if(isset($_SESSION["is_registered_$contest_id"])) {
@@ -88,24 +89,24 @@
 			margin-bottom: 20px;
 		}
 		.loader {
-		  border: 16px solid #f3f3f3;
-		  border-radius: 50%;
-		  border-top: 16px solid #3498db;
-		  width: 100px;
-		  height: 100px;
-		  -webkit-animation: spin 2s linear infinite; /* Safari */
-		  animation: spin 2s linear infinite;
+			border: 16px solid #f3f3f3;
+			border-radius: 50%;
+			border-top: 16px solid #3498db;
+			width: 100px;
+			height: 100px;
+			-webkit-animation: spin 2s linear infinite; /* Safari */
+			animation: spin 2s linear infinite;
 		}
 
 		/* Safari */
 		@-webkit-keyframes spin {
-		  0% { -webkit-transform: rotate(0deg); }
-		  100% { -webkit-transform: rotate(360deg); }
+			0% { -webkit-transform: rotate(0deg); }
+			100% { -webkit-transform: rotate(360deg); }
 		}
 
 		@keyframes spin {
-		  0% { transform: rotate(0deg); }
-		  100% { transform: rotate(360deg); }
+			0% { transform: rotate(0deg); }
+			100% { transform: rotate(360deg); }
 		}
     </style>
 </head>
@@ -142,7 +143,8 @@
 	            <table class="table table-bordered">
 	                <thead class="thead-dark">
 	                    <tr>
-	                        <th style="width:70%">Question</th>
+	                    	<th style="width: 3%"><i class="fa fa-check" aria-hidden="true"></i></th>
+	                        <th style="width:67%">Question</th>
 	                    	<th style="width:10%">Points</th>
 	                    	<th style="width:10%">Level</th>
 	                    	<th style="width:10%">Users</th>
@@ -151,6 +153,13 @@
 	                <tbody>
 	                    <?php foreach($questions as $question) { ?>
 	                    	<tr>
+	                    		<td>
+	                    			<i class="fa fa-minus-circle" aria-hidden="true" style="color: #dc3545;"></i>
+	                    			<i class="fa fa-times-circle" aria-hidden="true" style="color: #dc3545;"></i>
+	                    			<i class="fa fa-check-circle" aria-hidden="true" style="color: #dc3545;"></i>
+	                    			<i class="fa fa-check-circle" aria-hidden="true" style="color: #28a745;"></i>
+	                    			<i class="fa fa-check-circle" aria-hidden="true" style="color: #ffc107;"></i>
+	                    		</td>
 	                    		<td>
 	                    			<a href="join_contest.php?contestId=<?php echo $contest_id; ?>&readQuestion=<?php echo $question['question_id'] ?>"><?php echo $question['question_name'] ?></a>
 	                    		</td>
@@ -189,7 +198,6 @@
             $result = mysqli_query($conn, $q_sql);
             if($result) {
                 $question = mysqli_fetch_assoc($result);
-                // print_r($question);
                 $question_id = $question['question_id'];
                 $question_desc = $question['question_description'];
                 $question_name = $question['question_name'];
@@ -201,6 +209,12 @@
                 </script>";
             }
         ?>
+        <form action="contest_submission.php" id="submitForm" method="post" style="display: none;">
+        	<input type="hidden" name="contest_id" value="<?php echo $contest_id; ?>">	
+        	<input type="hidden" name="question_id" value="<?php echo $question_id; ?>">
+        	<input type="text" name="code" id="edCode">
+        	<input type="text" name="language" id="edLanguage">
+        </form>
         <div class="fcn-grid" style="/*background-color: red;*/">
         	<div class="fcn-component" style="background-color: #fff;">
         		<!-- <div class="comp-heading" style=""><h2><?php echo $question_name; ?></h2></div> -->
@@ -323,26 +337,62 @@ int main() {\n\
 				data: object,
 				success: function(res) {
 					if(res) {
-						// console.log(res);
-						// processResponse(res);
 						var obj = JSON. parse(res)
-						// console.log(obj.compile_status);
 						$("#out").css("display", "block");
     					$(".loader").css("display", "none");
 						if(obj.compile_status != "OK") {
 							$("#out").val(obj["compile_status"]);
-							// console.log(obj.compile_status);
 						} else {
-							// var html = $.parseHTML(obj["run_status"]["output"]);
 							$("#out").val(obj["run_status"]["output"]);
-							// console.log($(html).text());
-							// console.log($.parseHTMl(obj["run_status"]["output"]));
 						}
 					} else {
 						window.alert("Error in sending code");
 					}
 				}
 			});
+    	});
+    	$("#submit-btn").click(function(){
+    		$("#out").css("display", "none");
+    		$(".loader").css("display", "block");
+    		// var code = editor.session.getValue();
+    		// var object = {
+    		// 	"type": "submit",
+    		// 	"code": code,
+    		// 	"input": "",
+    		// 	"language": language
+    		// };
+    		$("#edCode").val(editor.session.getValue());
+			$("#edLanguage").val($("#lang").val());
+			if($("#lang").val() == "C" || $("#lang").val() == "CPP14") {
+				var code = editor.session.getValue();
+				var object = {
+	    			"type": "submit",
+	    			"code": code,
+	    			"lang": language
+    			}
+    			$.ajax({
+					url: "compile.php",
+					method: "post",
+					data: object,
+					success: function(res) {}
+				});
+			}
+			$("#submitForm").submit();
+    		//$.ajax({
+			// 	url: "compile.php",
+			// 	method: "post",
+			// 	data: object,
+			// 	success: function(res) {
+			// 		if(res) {
+			// 			// $('<form action="join_contest.php" method="post"><input type="hidden" name="code_submit" value="submit"></input></form>').submit();
+			// 			$("#edCode").val(object["code"]);
+			// 			$("#edLanguage").val(object["language"]);
+			// 			$("#submitForm").submit();
+			// 		} else {
+			// 			window.alert("Error in sending code");
+			// 		}
+			// 	}
+			// });
     	});
     </script>
 </body>

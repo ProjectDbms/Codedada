@@ -26,16 +26,11 @@ $config['language']='C';   	//(REQUIRED) Choose any one of them
 // #include <iostream>
 // using namespace std;
 // int main() {
-// int n;
-// cin >> n;
-// while(n--) {
-// 	cout << n << endl;
-// }
+// cout << "Hello"
 // return 0;
 // }';
 
 // $responseOfRun = run($hackerearth,$config);
-
 
 // echo "<pre>";
 // print_r($responseOfRun);
