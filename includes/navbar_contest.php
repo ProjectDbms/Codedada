@@ -20,7 +20,10 @@
                 <a class="nav-link" href="contest.php">Contests</a>
             </li>
             <li class="nav-item" id="nav3">
-                <a class="nav-link" href="join_contest.php?contestId=<?php echo $contest_id ?>&users=<?php echo $contest_id ?>">Users</a>
+                <a class="nav-link" href="contest_users.php?contestId=<?php echo $contest_id ?>">Users</a>
+            </li>
+            <li class="nav-item" id="nav4">
+                <a class="nav-link" href="contest_submission.php?contestId=<?php echo $contest_id ?>">Submissions</a>
             </li>
         </ul>
         <ul class="navbar-nav ml-auto" style="margin-right: 7rem;">

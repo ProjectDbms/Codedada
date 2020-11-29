@@ -8,10 +8,16 @@
 		if(!(isset($_SESSION["username"]))) {
 			header("location: login.php");
 		}
-        include("includes/header.php");
-        // if()
         if(isset($_GET['contestId'])) {
             $contest_id = $_GET['contestId'];
+            $con_sql = "SELECT * FROM contest WHERE contest_id=$contest_id";
+            $con_result = mysqli_query($conn, $con_sql);
+            $contest_row = mysqli_fetch_assoc($con_result);
+            $start_time_contest = $contest_row['start_time'];
+            $end_time_contest = $contest_row['end_time'];
+            if(strtotime($start_time_contest)>time() || strtotime($end_time_contest)<time()) {
+            	header("location: contest.php");
+            }
             if(isset($_SESSION["is_registered_$contest_id"])) {
                 
             } else {
@@ -24,94 +30,15 @@
             header("location: contest.php");
         }
     ?>
-    <link rel="stylesheet" href="assets/css/timeTo.css?q=<?php echo time(); ?>" type="text/css">
-	<script type="text/javascript" src="assets/js/jquery-time-to.js"></script>
-    <script type="text/javascript">
-		function countdownCalc(startTime, el) {
-			$(el).timeTo({
-				timeTo: new Date(new Date(startTime)),
-				theme: "black",
-				displayCaptions: true,
-				fontSize: 21,
-				captionSize: 10,
-				callback: function() {
-					window.location.href = "contest.php";
-				}
-			});
-		}
-	</script>
-    <style type="text/css">
-    	.fcn-grid {
-		    position: relative;
-		    flex: 1 0 auto;
-		    min-width: 960px;
-		    height: calc(100vh - 3.7rem);
-		    height: calc(100vh - 3.79rem);
-		    background-color: #15141f;
-		}
-		.fcn-slot.fcn-slot--no-left-neighbor {
-		    padding-left: 0;
-		}
-		.fcn-slot.fcn-slot--no-bottom-neighbor {
-		    padding-bottom: 0;
-		}
-		.fcn-slot.fcn-slot--no-top-neighbor {
-		    padding-top: 0;
-		}
-		.fcn-component {
-		    display: flex;
-		    flex-direction: column;
-		    height: 100%;
-		    width: 43%;
-		    float: left;
-		    position: relative;
-		    overflow-wrap: break-word;
-		    overflow-y: auto;
-		    padding-left: 10px;
-		}
 
-		.fcnn-component {
-			display: flex;
-		    flex-direction: column;
-		    height: 100%;
-		    width: 57%;
-		    margin-bottom: -50rem;
-		    position: relative;
-		}
-
-		.comp-heading {
-			background-color: #f6f5fa;
-			/*overflow-wrap: break-word;*/
-			height: auto; 
-			/*min-height: 50px;*/
-			margin-left: -10px; 
-			padding: 5px 5px; 
-			margin-bottom: 20px;
-		}
-		.loader {
-			border: 16px solid #f3f3f3;
-			border-radius: 50%;
-			border-top: 16px solid #3498db;
-			width: 100px;
-			height: 100px;
-			-webkit-animation: spin 2s linear infinite; /* Safari */
-			animation: spin 2s linear infinite;
-		}
-
-		/* Safari */
-		@-webkit-keyframes spin {
-			0% { -webkit-transform: rotate(0deg); }
-			100% { -webkit-transform: rotate(360deg); }
-		}
-
-		@keyframes spin {
-			0% { transform: rotate(0deg); }
-			100% { transform: rotate(360deg); }
-		}
-    </style>
+    <link rel="stylesheet" href="assets/css/contestIde.css" type="text/css">
+    <link rel="icon" href="assets/images/programming.png" type="image/png">
 </head>
 <body>
-    <?php include("includes/navbar_contest.php"); ?>
+    <?php 
+    include_once("includes/header.php");
+    include("includes/navbar_contest.php"); 
+    ?>
     <div class="container-fluid">
     	<?php if(isset($_GET['contestId']) && isset($_GET['problems'])) { ?>
     		<div class="question-table mt-5">
@@ -127,15 +54,44 @@
 	                }
 	            ?>
 	            <h3 style="color: red;">Ends In</h3>
-	            <div class="content" style="/*position: sticky; float: left; margin-bottom: -2rem;*/">
+	            <div class="content">
 	            	<div id="timer"></div><br>
 	            </div>
+	            <link rel="stylesheet" href="assets/css/timeTo.css?q=<?php echo time(); ?>" type="text/css" />
+				<script type="text/javascript" src="assets/js/jquery-time-to.js"></script>
+			    <script type="text/javascript">
+					function countdownCalc(startTime, el) {
+						$(el).timeTo({
+							timeTo: new Date(new Date(startTime)),
+							theme: "black",
+							displayCaptions: true,
+							fontSize: 21,
+							captionSize: 10,
+							callback: function() {
+								var object = {
+									"contestId": parseInt("<?php echo $contest_id; ?>")
+								};
+								$.ajax({
+									url: "calculate_rank.php",
+									method: "post",
+									data: object,
+									success: function(res) {
+										if(res) {
+											console.log(res);
+										} else {
+											window.alert("Error calculating rank");
+										}
+									}
+								});
+								window.location.href = "contest.php";
+							}
+						});
+					}
+				</script>
 	            <?php
 	            	$c_sql = "SELECT * FROM contest WHERE contest_id=$contest_id";
 	                $c_result = mysqli_query($conn, $c_sql);
 	                $c_contest = mysqli_fetch_assoc($c_result);
-					// $present_contest_id = $contest['contest_id'];
-					// print_r($c_contest);
 					$entime = $c_contest['end_time'];
 					$contest_end_time = date("M d Y H:i:s", strtotime($entime))." UTC+5:30";
 					echo "<script>countdownCalc('$contest_end_time','#timer');</script>";
@@ -154,11 +110,53 @@
 	                    <?php foreach($questions as $question) { ?>
 	                    	<tr>
 	                    		<td>
-	                    			<i class="fa fa-minus-circle" aria-hidden="true" style="color: #dc3545;"></i>
+	                    			<!-- <i title="Unattempted" class="fa fa-minus-circle" aria-hidden="true" style="color: #dc3545;"></i>
 	                    			<i class="fa fa-times-circle" aria-hidden="true" style="color: #dc3545;"></i>
 	                    			<i class="fa fa-check-circle" aria-hidden="true" style="color: #dc3545;"></i>
 	                    			<i class="fa fa-check-circle" aria-hidden="true" style="color: #28a745;"></i>
-	                    			<i class="fa fa-check-circle" aria-hidden="true" style="color: #ffc107;"></i>
+	                    			<i class="fa fa-check-circle" aria-hidden="true" style="color: #ffc107;"></i> -->
+	                    			<?php
+	                    				$username = $_SESSION['username'];
+	                    				$us_sql = "SELECT * FROM accounts WHERE username='$username'";
+	                    				$us_result = mysqli_query($conn, $us_sql);
+	                    				$us_row = mysqli_fetch_assoc($us_result);
+	                    				// print_r($us_row);
+	                    				$account_id = $us_row['account_id'];
+	                    				$par_sql = "SELECT * FROM participant WHERE account_id=$account_id AND contest_id=$contest_id";
+	                    				$par_result = mysqli_query($conn, $par_sql);
+	                    				$par_row = mysqli_fetch_assoc($par_result);
+	                    				// print_r($par_row);
+	                    				$participant_id = $par_row['participant_id'];
+	                    				$question_id = $question['question_id'];
+	                    				$tc_sql = "SELECT points FROM testcase WHERE question_id=$question_id";
+	                    				$ts_result = mysqli_query($conn, $tc_sql);
+	                    				$testcases = mysqli_fetch_all($ts_result, MYSQLI_ASSOC);
+	                    				$points = 0;
+	                    				foreach ($testcases as $testcase) {
+	                    					$points += $testcase['points'];
+	                    				}
+	                    				$subm_sql = "SELECT submission.participant_id, submission.question_id, submission.submission_id ,SUM(points) AS points FROM submission_verdict sv, submission 
+WHERE sv.submission_id=submission.submission_id AND participant_id=$participant_id AND question_id=$question_id GROUP BY sv.submission_id";
+	                    				$subm_result = mysqli_query($conn, $subm_sql);
+	                    				if(mysqli_num_rows($subm_result) > 0) {
+	                    					$subm_row = mysqli_fetch_all($subm_result, MYSQLI_ASSOC);
+		                    				$max_points = 0;
+		                    				foreach ($subm_row as $sub_marks) {
+		                    					if($sub_marks['points'] >= $max_points) {
+		                    						$max_points = $sub_marks['points'];
+		                    					}
+		                    				}
+		                    				if($max_points == 0) {
+		                    					echo '<i title="Wrong Answer" class="fa fa-times-circle" aria-hidden="true" style="color: #dc3545;"></i>';
+		                    				} elseif($max_points == $points) {
+		                    					echo '<i title="Solved" class="fa fa-check-circle" aria-hidden="true" style="color: #28a745;"></i>';
+		                    				} else {
+		                    					echo '<i title="Partially Correct" class="fa fa-check-circle" aria-hidden="true" style="color: #ffc107;"></i>';
+		                    				}
+	                    				} else {
+	                    					echo '<i title="Unattempted" class="fa fa-minus-circle" aria-hidden="true" style="color: #dc3545;"></i>';
+	                    				}
+	                    			?>
 	                    		</td>
 	                    		<td>
 	                    			<a href="join_contest.php?contestId=<?php echo $contest_id; ?>&readQuestion=<?php echo $question['question_id'] ?>"><?php echo $question['question_name'] ?></a>
@@ -215,9 +213,8 @@
         	<input type="text" name="code" id="edCode">
         	<input type="text" name="language" id="edLanguage">
         </form>
-        <div class="fcn-grid" style="/*background-color: red;*/">
-        	<div class="fcn-component" style="background-color: #fff;">
-        		<!-- <div class="comp-heading" style=""><h2><?php echo $question_name; ?></h2></div> -->
+        <div class="fcn-grid">
+        	<div class="fcn-component">
         		<div class="card text-white bg-primary mr-3 mt-1">
         			<div class="card-header bg-dark"><?php echo $question_name; ?></div>
 					<div class="card-body">
@@ -225,13 +222,13 @@
 	            	</div>
 	            </div>
         	</div>
-    		<div class="fcnn-component" style="/*background-color: lightblue;*/">
+    		<div class="fcnn-component">
     			<div class="ide" style="height: 67%; position: relative;">
     				<?php
     					include('ide.php');
     				?>
     			</div>
-    			<div class="buttons-out" style="/*background-color: blue;*/ margin-bottom: 0px; height: 33%;">
+    			<div class="buttons-out">
     				<div class="buttons" style="background-color: black; height: 20%; padding-top: 2px;">
     					<button class="btn btn-primary" id="run-btn" style="float: left; margin-left: 40px;">Run</button>
     					<select name="lang" id="lang" class="form-control" style="width: 150px; float: left; margin-left: 290px;">
@@ -244,7 +241,7 @@
     					</select>
     					<button class="btn btn-danger" id="submit-btn" style="float: right; margin-right: 40px;">Submit</button>
     				</div>
-    				<div class="output-input" style="clear: both; /*background-color: green;*/ height: 80%; background-color: #272822;">
+    				<div class="output-input" style="clear: both; height: 80%; background-color: #272822;">
     					<div class="input" style="float: left; width: 46%; margin-left: 20px;">
     						<label style="color: white;">Input</label><br>
     						<textarea rows="7" class="form-control" id="in" style="font-size: 12px; font-weight: 600;"></textarea>
@@ -354,13 +351,6 @@ int main() {\n\
     	$("#submit-btn").click(function(){
     		$("#out").css("display", "none");
     		$(".loader").css("display", "block");
-    		// var code = editor.session.getValue();
-    		// var object = {
-    		// 	"type": "submit",
-    		// 	"code": code,
-    		// 	"input": "",
-    		// 	"language": language
-    		// };
     		$("#edCode").val(editor.session.getValue());
 			$("#edLanguage").val($("#lang").val());
 			if($("#lang").val() == "C" || $("#lang").val() == "CPP14") {
@@ -378,22 +368,9 @@ int main() {\n\
 				});
 			}
 			$("#submitForm").submit();
-    		//$.ajax({
-			// 	url: "compile.php",
-			// 	method: "post",
-			// 	data: object,
-			// 	success: function(res) {
-			// 		if(res) {
-			// 			// $('<form action="join_contest.php" method="post"><input type="hidden" name="code_submit" value="submit"></input></form>').submit();
-			// 			$("#edCode").val(object["code"]);
-			// 			$("#edLanguage").val(object["language"]);
-			// 			$("#submitForm").submit();
-			// 		} else {
-			// 			window.alert("Error in sending code");
-			// 		}
-			// 	}
-			// });
     	});
+    </script>
+    <script type="text/javascript">
     </script>
 </body>
 </html>
