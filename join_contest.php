@@ -7,6 +7,8 @@
 		include_once("includes/db_connection.php");
 		if(!(isset($_SESSION["username"]))) {
 			header("location: login.php");
+		} else {
+			
 		}
         if(isset($_GET['contestId'])) {
             $contest_id = $_GET['contestId'];
@@ -26,6 +28,16 @@
                     window.location.href = 'contest.php';
                 </script>";
             }
+            $username = $_SESSION['username'];
+			$us_sql = "SELECT * FROM accounts WHERE username='$username'";
+			$us_result = mysqli_query($conn, $us_sql);
+			$us_row = mysqli_fetch_assoc($us_result);
+			$account_id = $us_row['account_id'];
+
+			$par_sql = "SELECT * FROM participant WHERE account_id=$account_id AND contest_id=$contest_id";
+			$par_result = mysqli_query($conn, $par_sql);
+			$par_row = mysqli_fetch_assoc($par_result);
+			$participant_id = $par_row['participant_id'];
         } else {
             header("location: contest.php");
         }
@@ -57,8 +69,13 @@
 	            <div class="content">
 	            	<div id="timer"></div><br>
 	            </div>
+	            <br>
+	            <a href="contest_submission.php?contestId=<?php echo $contest_id; ?>&participantId=<?php echo $participant_id; ?>">MySubmissions</a>
+	            <br>
+
 	            <link rel="stylesheet" href="assets/css/timeTo.css?q=<?php echo time(); ?>" type="text/css" />
 				<script type="text/javascript" src="assets/js/jquery-time-to.js"></script>
+
 			    <script type="text/javascript">
 					function countdownCalc(startTime, el) {
 						$(el).timeTo({
@@ -68,22 +85,7 @@
 							fontSize: 21,
 							captionSize: 10,
 							callback: function() {
-								var object = {
-									"contestId": parseInt("<?php echo $contest_id; ?>")
-								};
-								$.ajax({
-									url: "calculate_rank.php",
-									method: "post",
-									data: object,
-									success: function(res) {
-										if(res) {
-											console.log(res);
-										} else {
-											window.alert("Error calculating rank");
-										}
-									}
-								});
-								window.location.href = "contest.php";
+								window.location.href = "calculate_rank.php?contestId=<?php echo $contest_id; ?>";
 							}
 						});
 					}

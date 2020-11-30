@@ -14,6 +14,23 @@
 	// echo $q;
 	// fclose($myfile);
 	$contest_id = $_GET['contestId'];
+	// include_once("api.php");
+	// $config['language'] = 'PYTHON3';
+	// $config['source'] = 'prin("Hello")';
+	// $config['language'] = 'CPP14';
+	// $config['source'] = '
+	// #include<iostream>
+	// using namespace std;
+	// int main() {
+	// 	cout << "Hello" << endl
+	// 	return 0;
+	// }';
+	// $responseOfRun = run($hackerearth,$config);
+	// echo "<pre>";
+	// print_r($responseOfRun);
+	// echo "</pre>";
+	// echo "<br>";
+	// echo $responseOfRun['run_status']['stderr']=='';
 ?>
 
 <script>
